@@ -8,7 +8,13 @@ class ChequeImport(models.Model):
     user = models.ForeignKey(
         core_models.InteractiveUser, models.DO_NOTHING, db_column="UserID"
     )
-    stored_file = models.FileField(upload_to="csImports/%Y/%m/", db_column="ImportFile",default="")
+    stored_file = models.FileField(
+        upload_to="csImports/%Y/%m/",
+        db_column="ImportFile",
+        default="", 
+        null=True,
+        blank=True
+    )
 
     class Meta:
         db_table = "tblChequeSanteImport"
