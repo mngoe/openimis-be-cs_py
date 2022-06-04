@@ -1,31 +1,27 @@
-# openIMISS Backend productpackage reference module
-This repository holds the files of the openIMIS Backend productpackage reference module. It is dedicated to be deployed as a module of [openimis-be_py](https://github.com/openimis/openimis-be_py). 
- Start creating openimis-be-productpackage_py module.
+# openIMIS Backend productpackage reference module
+This repository holds the files of the openIMIS Backend Cheque Santé reference module. 
 
-- from an empty repository folder (The case we have used)
+It is dedicated to be deployed as a module of [openimis-be_py](https://github.com/openimis/openimis-be_py). 
 
-  - clone the repository or donwload the file (productpackage)
+ Start creating openimis-be-cs_py module.
 
-  - checkout to the develop branch by executing the command: git checkout develop or create a new develop branch
-   if not created with the command git checkout -b develop (used in our case)
+- from an empty repository folder
 
-  - within openimis-be-productpackage_py, create the sub repository named productpackage
+  - clone the repository or donwload the file (cs)
+
+  - checkout to the develop branch by executing the command
+
+  - within openimis-be-cs_py, create the sub repository named cs
 
   - prepare your module to be mounted via pip: create and 
-  complete the /openimis-be-productpackage_py/ by creating or copying the setup.py, MANIFEST.in, 
+  complete the /openimis-be-cs_py/ by creating or copying the setup.py, MANIFEST.in, 
   LICENSE.md and README.md (if not created), ... files (the files could be copied from product module and 
   being adpted to productpackage module needs.
 
-  - create the file /openimis-be-productpackagee_py/productpackage/urls.py (even empty) 
+  - create the file /openimis-be-cs_py/cs/urls.py (even empty) 
    with content: urlpatterns = []
 
   - from /openimis-be_py/openIMIS: register your module in the pip requirements of openIMIS,
-    referencing your 'local' codebase: pip install -e ../../openimis-be-productpackage_py/
+    referencing your 'local' codebase: pip install -e ../../openimis-be-cs_py/
 
   - register your module to openIMIS django site in /openimis-be_py/openimis.json
-
-
-- Without having an empty repository
-  follow the link : 
-  https://github.com/mngoe/openimis-be_py/tree/develop 
-  and at To create a new openIMIS module (e.g. openimis-be-mymodule) part
