@@ -1,5 +1,5 @@
 """ Model OpenIMIS Be Cheque Santé
-Models of Cameroon Cheque Santé project 
+Models of Cameroon Cheque Santé project
 """
 
 from django.db import models
