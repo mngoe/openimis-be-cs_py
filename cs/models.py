@@ -3,10 +3,13 @@ from django.db import models
 from core import models as core_models
 
 class ChequeImport(models.Model):
-    """ Class Cheque Import : 
+    """ Class Cheque Import :
     Class for importation of check in the system
     """
-    idChequeImport = models.AutoField(db_column="ChequeImportID", primary_key=True)
+    idChequeImport = models.AutoField(
+        db_column="ChequeImportID",
+        primary_key=True
+    )
     importDate = models.DateTimeField()
     user = models.ForeignKey(
         core_models.InteractiveUser, models.DO_NOTHING, db_column="UserID"
@@ -19,7 +22,7 @@ class ChequeImport(models.Model):
         blank=True
     )
 
-    """ Class Meta : 
+    """ Class Meta :
     Class Meta to define specific table
     """
     class Meta:
@@ -28,7 +31,7 @@ class ChequeImport(models.Model):
 
 
 class ChequeImportLine(models.Model):
-    """ Class Cheque Import Line : 
+    """ Class Cheque Import Line :
     Class to save parsed CSV file uploaded and save all insert / update
     """
     idChequeImportLine = models.AutoField( primary_key=True)
