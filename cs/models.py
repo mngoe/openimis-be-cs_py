@@ -1,4 +1,3 @@
-import uuid
 from django.db import models
 from core import models as core_models
 
@@ -41,7 +40,7 @@ class ChequeImportLine(models.Model):
     chequeImportLineStatus = models.CharField(max_length=50)
 
 
-    """ Class Meta : 
+    """ Class Meta :
     Class Meta to define specific table
     """
     class Meta:
