@@ -26,8 +26,7 @@ class ChequeImportGQLType(DjangoObjectType):
         model = ChequeImport
         interfaces = (graphene.relay.Node,)
         filter_fields = {
-            "UserID": ["exact", "istartswith", "icontains", "iexact"],
-            "ImportFile": ["exact"],
+            "user": ["exact"],
             "importDate": ["exact", "lt", "lte", "gt", "gte"],
         }
         connection_class = ExtendedConnection
