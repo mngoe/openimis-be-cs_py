@@ -5,7 +5,6 @@ from django.urls import reverse
 
 from cs.forms import UploadFileFormCheque
 from cs.models import ChequeImport
-import json
 import pandas as pd
 
 
