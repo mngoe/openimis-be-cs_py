@@ -52,7 +52,7 @@ def insert_data_to_cheque():
     if request.user.is_authenticated:
         ChequeImport.user = request.user.id
         ChequeImport.importDate = datetime.date.today()
-        views.upload_file()
+        views.upload_file[1]
         ChequeImport.save()
     else:
         raise NameError({
@@ -81,7 +81,7 @@ class ChequeImportLine(models.Model):
 
 
 def insert_data_to_cheque_line(self):
-    data_parsed = parse_csv_file(views.upload_file)
+    data_parsed = parse_csv_file(views.upload_file[1])
     for i in range(len(data_parsed)):
         if ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0]).exists():
             id_import_value = ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0])
