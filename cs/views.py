@@ -1,7 +1,6 @@
-from django.core.checks import messages
+from io import TextIOWrapper
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
-from django.urls import reverse
 
 from cs.forms import UploadFileFormCheque
 from cs.models import ChequeImport
@@ -13,11 +12,9 @@ def upload_file(request):  # function allows the uploading of file from cheque i
     if request.method == 'POST':
         form = UploadFileFormCheque(request.POST, request.FILES)
         if form.is_valid():
-            stored_file_instance = ChequeImport(stored_file=request.FILES['file'])
+            stored_file_instance = ChequeImport(TextIOWrapper(request.FILES['file'], encoding="utf-8", newline=""))
             stored_file_instance.save()
-            stored_data_csv = stored_file_instance.stored_file
-            response_http = HttpResponseRedirect('/cheque/importfile/uploads')
-            return {1: stored_data_csv, 2: response_http}
+            return HttpResponseRedirect('/cheque/importfile/uploads')
     else:
         form = UploadFileFormCheque()
     return render(request, 'upload_csv.html', {'form': form})
@@ -28,3 +25,7 @@ def parse_csv_file(csv_file):  # json_file is the returned file uploaded by uplo
     return data_parsed
 
 
+"""if __name__ == '__main__':
+    store_file = upload_file(request)[1]
+    data_parsed = parse_csv_file(store_file)
+    print(data_parsed[1])"""
