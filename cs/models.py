@@ -7,9 +7,10 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from core import models as core_models
 from django.http import request
+import pandas as pd
+
 
 from cs import views
-from cs.views import parse_csv_file
 
 
 class ChequeImport(models.Model):
@@ -78,6 +79,12 @@ class ChequeImportLine(models.Model):
 
     class Meta:
         db_table = 'tblChequeSanteImportLine'
+
+
+
+def parse_csv_file(csv_file):  # json_file is the returned file uploaded by upload_file function
+    data_parsed = pd.read_csv(csv_file)
+    return data_parsed
 
 
 def insert_data_to_cheque_line(self):
