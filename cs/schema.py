@@ -5,9 +5,6 @@ from cs.models import ChequeImportLine, ChequeImport
 
 
 class ChequeImportLineGQLType(DjangoObjectType):
-
-
-
     class Meta:
         model = ChequeImportLine
         interfaces = (graphene.relay.Node,)
@@ -18,10 +15,8 @@ class ChequeImportLineGQLType(DjangoObjectType):
         }
         connection_class = ExtendedConnection
 
+
 class ChequeImportGQLType(DjangoObjectType):
-
-
-
     class Meta:
         model = ChequeImport
         interfaces = (graphene.relay.Node,)
@@ -30,8 +25,6 @@ class ChequeImportGQLType(DjangoObjectType):
             "importDate": ["exact", "lt", "lte", "gt", "gte"],
         }
         connection_class = ExtendedConnection
-
-
 
 
 class Query(graphene.ObjectType):
