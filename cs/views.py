@@ -4,7 +4,7 @@ from django.shortcuts import render
 # from cs.models import ChequeImport
 from cs.models import ChequeImport, upload_cheque_to_db
 from django.core import serializers
-from cs.serializers import serializers
+from cs import serialize
 from rest_framework.decorators import api_view
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
@@ -43,7 +43,7 @@ def upload_cheques(request):
 
 @api_view(["POST"])
 def upload_cheque_file(request):
-    serializer = serializers.UploadSerializer(data=request.data)
+    serializer = serialize.UploadSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     errors = []
     file = serializer.validated_data.get("file")
