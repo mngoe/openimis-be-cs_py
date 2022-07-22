@@ -12,7 +12,6 @@ cs/tests.py
 cs/urls.py
 cs/views.py
 cs/migrations/0001_initial.py
-cs/migrations/__init__.py
 openimis_be_cs.egg-info/PKG-INFO
 openimis_be_cs.egg-info/SOURCES.txt
 openimis_be_cs.egg-info/dependency_links.txt
