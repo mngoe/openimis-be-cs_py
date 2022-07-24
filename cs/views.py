@@ -81,6 +81,7 @@ def upload_cheque_file(request):
     try:
         logger.info(f"Uploading cheque file in CSV format (file={file})...")
         logger.info(f"cheque upload completed: {request.user.id}")
+        print(file)
         result = upload_cheque_to_db(
             request.user, file)
         logger.info(f"cheque upload completed: {result}")

@@ -11,12 +11,9 @@ from core.models import InteractiveUser
 from django.http import request
 from django.utils import timezone as django_tz 
 import pandas as pd
+import logging
 
-
-# from cs.views import parse_csv_file
-#from cs.views import logger
-
-
+logger = logging.getLogger(__name__)
 class ChequeImport(models.Model):
     """ Class Cheque Import :
     Class for importation of check in the system
@@ -76,7 +73,9 @@ class ChequeImportLine(models.Model):
     idChequeImportLine = models.AutoField(primary_key=True)
     chequeImportId = models.ForeignKey(ChequeImport, models.DO_NOTHING)
     chequeImportLineCode = models.CharField(max_length=100)
-    chequeImportLineDate = models.DateTimeField()
+    chequeImportLineDate = models.DateTimeField(
+        'Current Import Date', default=django_tz.now, blank=True
+    )
     chequeImportLineStatus = models.CharField(max_length=50)
 
     """ Class Meta :
@@ -86,38 +85,6 @@ class ChequeImportLine(models.Model):
     class Meta:
         db_table = 'tblChequeSanteImportLine'
 
-
-"""def insert_data_to_cheque_line(self):
-
-def parse_csv_file(csv_file):  # json_file is the returned file uploaded by upload_file function
-    data_parsed = pd.read_csv(csv_file)
-    return data_parsed
-
-
-def insert_data_to_cheque_line(self):
-    data_parsed = parse_csv_file(views.upload_file[1])
-    for i in range(len(data_parsed)):
-        if ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0]).exists():
-            id_import_value = ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0])
-            [0][ChequeImportLine.chequeImportId]
-            ChequeImport.update_specific_user_id(id_import_value)
-            ChequeImportLine.chequeImportLineCode = data_parsed.values[i][0]
-            ChequeImportLine.chequeImportId = id_import_value
-            ChequeImportLine.chequeImportLineDate = datetime.date.today()
-            ChequeImportLine.chequeImportLineStatus = data_parsed.values[i][1]
-            ChequeImportLine.save()
-        else:
-            if ChequeImport.objects.filter(user=request.user.id).exists():
-
-                ChequeImportLine.chequeImportId = ChequeImport.objects.filter(user=request.user.id)
-                [0][ChequeImport.idChequeImport]
-                ChequeImportLine.chequeImportLineCode = data_parsed.values[i][0]
-                ChequeImportLine.chequeImportLineDate = datetime.date.today()
-                ChequeImportLine.chequeImportLineStatus = data_parsed.values[i][1]
-                ChequeImportLine.save()
-            else:
-                print(f"User  with id {ChequeImport.idChequeImport} does not exist.")
-"""
 
 @dataclass
 class UploadChequeResult:
@@ -133,19 +100,42 @@ def upload_cheque_to_db(user, file):
     result = UploadChequeResult(errors=errors)
 
     try:
-        print(type(user))
-        print(user)
-        print(user.username)
         user = InteractiveUser.objects.filter(login_name=user.username).first()
-        print(type(user))
-        print(user);
-        ChequeImport.objects.create(user=user, stored_file=file)
+        chequeImportCreated = ChequeImport.objects.create(user=user, stored_file=file)
+        ## Parsing CSV File to iterate on different lines
+        tableChequeToImport = insert_data_to_cheque_line(
+            chequeImportCreated.stored_file,
+            chequeImportCreated
+            )
+        
         result.created += 1
 
     except Exception as exc:
-    #    logger.exception(exc)
+        logger.exception(exc)
         print(exc);
         errors.append("An unknown error occured.")
-
-    #logger.debug(f"Finished processing of cheque: {result}")
     return result
+
+def parse_csv_file(csv_file):
+    data_parsed = pd.read_csv(csv_file)
+    return data_parsed
+
+
+def insert_data_to_cheque_line(csv_file, chequeImport):
+    data_parsed = parse_csv_file(csv_file)
+    for index, row in data_parsed.iterrows():
+        chequeImportLineInstance = ChequeImportLine()
+        if ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).exists():
+            id_import_value = ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0])
+            [0][ChequeImportLine.chequeImportId]
+            ChequeImport.update_specific_user_id(id_import_value)
+            ChequeImportLine.chequeImportLineCode = data_parsed.values[i][0]
+            ChequeImportLine.chequeImportId = id_import_value
+            ChequeImportLine.chequeImportLineDate = datetime.date.today()
+            ChequeImportLine.chequeImportLineStatus = data_parsed.values[i][1]
+            ChequeImportLine.save()
+        else:
+            chequeImportLineInstance.chequeImportId = chequeImport
+            chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
+            chequeImportLineInstance.chequeImportLineStatus = row['ChequeStatus']
+            chequeImportLineInstance.save()
