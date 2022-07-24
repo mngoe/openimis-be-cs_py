@@ -126,16 +126,21 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
     for index, row in data_parsed.iterrows():
         chequeImportLineInstance = ChequeImportLine()
         if ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).exists():
-            id_import_value = ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0])
-            [0][ChequeImportLine.chequeImportId]
-            ChequeImport.update_specific_user_id(id_import_value)
-            ChequeImportLine.chequeImportLineCode = data_parsed.values[i][0]
-            ChequeImportLine.chequeImportId = id_import_value
-            ChequeImportLine.chequeImportLineDate = datetime.date.today()
-            ChequeImportLine.chequeImportLineStatus = data_parsed.values[i][1]
-            ChequeImportLine.save()
+            print("Code deja existant - Update ")
+            chequeImportLineInstanceUpdate = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
+            chequeImportLineInstanceUpdate.chequeImportLineStatus = row['ChequeStatus']
+            chequeImportLineInstanceUpdate.save()
+            logger.exception("--------")
+            logger.exception("Cheque Import Line Update :")
+            logger.exception(row['NumCheque'])
+            logger.exception(row['ChequeStatus'])
         else:
             chequeImportLineInstance.chequeImportId = chequeImport
             chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
             chequeImportLineInstance.chequeImportLineStatus = row['ChequeStatus']
             chequeImportLineInstance.save()
+            print("Code deja existant - Creation ")
+            logger.exception("--------")
+            logger.exception("Cheque Import Line Create :")
+            logger.exception(row['NumCheque'])
+            logger.exception(row['ChequeStatus'])
