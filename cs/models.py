@@ -7,14 +7,14 @@ from dataclasses import dataclass
 from django.core.exceptions import ValidationError
 from django.db import models
 from core import models as core_models
+from core.models import InteractiveUser
 from django.http import request
+from django.utils import timezone as django_tz 
 import pandas as pd
 
 
-from cs import views
-
 # from cs.views import parse_csv_file
-from cs.views import logger
+#from cs.views import logger
 
 
 class ChequeImport(models.Model):
@@ -25,7 +25,9 @@ class ChequeImport(models.Model):
         db_column="ChequeImportID",
         primary_key=True
     )
-    importDate = models.DateTimeField()
+    importDate = models.DateTimeField(
+        'Current Import Date', default=django_tz.now, blank=True
+    )
     user = models.ForeignKey(
         core_models.InteractiveUser, models.DO_NOTHING, db_column="UserID"
     )
@@ -57,7 +59,7 @@ def insert_data_to_cheque():
     if request.user.is_authenticated:
         ChequeImport.user = request.user.id
         ChequeImport.importDate = datetime.date.today()
-        views.upload_file()
+        #views.upload_file()
         ChequeImport.save()
     else:
         raise NameError({
@@ -86,7 +88,6 @@ class ChequeImportLine(models.Model):
 
 
 """def insert_data_to_cheque_line(self):
-=======
 
 def parse_csv_file(csv_file):  # json_file is the returned file uploaded by upload_file function
     data_parsed = pd.read_csv(csv_file)
@@ -94,7 +95,6 @@ def parse_csv_file(csv_file):  # json_file is the returned file uploaded by uplo
 
 
 def insert_data_to_cheque_line(self):
->>>>>>> 76a7e5f141e96abe9a22257a505f8f633490b69b
     data_parsed = parse_csv_file(views.upload_file[1])
     for i in range(len(data_parsed)):
         if ChequeImportLine.objects.filter(chequeImportLineCode=data_parsed.values[i][0]).exists():
@@ -131,15 +131,21 @@ class UploadChequeResult:
 def upload_cheque_to_db(user, file):
     errors = []
     result = UploadChequeResult(errors=errors)
-    logger.info("Uploading cheque to database with file ={file} & user ={user}")
 
     try:
+        print(type(user))
+        print(user)
+        print(user.username)
+        user = InteractiveUser.objects.filter(login_name=user.username).first()
+        print(type(user))
+        print(user);
         ChequeImport.objects.create(user=user, stored_file=file)
         result.created += 1
 
     except Exception as exc:
-        logger.exception(exc)
+    #    logger.exception(exc)
+        print(exc);
         errors.append("An unknown error occured.")
 
-    logger.debug(f"Finished processing of cheque: {result}")
+    #logger.debug(f"Finished processing of cheque: {result}")
     return result

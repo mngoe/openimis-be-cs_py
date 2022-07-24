@@ -3,9 +3,6 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from cs.models import ChequeImport, upload_cheque_to_db
 from django.core import serializers
-# from cs.models import ChequeImport
-from cs.models import ChequeImport, upload_cheque_to_db
-from django.core import serializers
 from cs import serialize
 from rest_framework.decorators import api_view
 from django.views.decorators.http import require_http_methods
@@ -80,12 +77,15 @@ def upload_cheque_file(request):
     serializer.is_valid(raise_exception=True)
     errors = []
     file = serializer.validated_data.get("file")
+    filename = serializer.validated_data.get("fileName")
     try:
         logger.info(f"Uploading cheque file in CSV format (file={file})...")
+        logger.info(f"cheque upload completed: {request.user.id}")
         result = upload_cheque_to_db(
-            request.user.id, store_file=file)
+            request.user, file)
         logger.info(f"cheque upload completed: {result}")
     except Exception as exc:
+        print(exc)
         logger.exception(exc)
         errors.append("An unknown error occurred.")
         errors.append(f"File '{file}' is not a valid CSV")
