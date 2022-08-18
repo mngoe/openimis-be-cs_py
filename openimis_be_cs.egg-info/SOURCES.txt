@@ -5,9 +5,9 @@ setup.py
 cs/__init__.py
 cs/admin.py
 cs/apps.py
-cs/forms.py
 cs/models.py
 cs/schema.py
+cs/serialize.py
 cs/tests.py
 cs/urls.py
 cs/views.py
