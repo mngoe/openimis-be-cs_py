@@ -129,15 +129,15 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
             chequeImportLineInstance = ChequeImportLine()
             if ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).exists():
                 print("Code deja existant - Update ")
-                chequeImportGet = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
-                if chequeImportGet.chequeImportLineStatus != "Used":
-                    chequeImportLineInstanceUpdate = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
-                    chequeImportLineInstanceUpdate.chequeImportLineStatus = row['ChequeStatus']
-                    chequeImportLineInstanceUpdate.save()
-                    logger.exception("--------")
-                    logger.exception("Cheque Import Line Update :")
-                    logger.exception(row['NumCheque'])
-                    logger.exception(row['ChequeStatus'])
+                print(ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).get())
+                
+                chequeImportLineInstanceUpdate = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
+                chequeImportLineInstanceUpdate.chequeImportLineStatus = row['ChequeStatus']
+                chequeImportLineInstanceUpdate.save()
+                logger.exception("--------")
+                logger.exception("Cheque Import Line Update :")
+                logger.exception(row['NumCheque'])
+                logger.exception(row['ChequeStatus'])
             else:
                 chequeImportLineInstance.chequeImportId = chequeImport
                 chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
