@@ -117,13 +117,17 @@ def upload_cheque_to_db(user, file):
     return result
 
 def parse_csv_file(csv_file):
-    data_parsed = pd.read_csv(csv_file)
+    data_parsed = pd.read_csv(csv_file, converters={i: str for i in range(100)})
     return data_parsed
 
 
 def insert_data_to_cheque_line(csv_file, chequeImport):
     data_parsed = parse_csv_file(csv_file)
+    
     for index, row in data_parsed.iterrows():
+        print(" Row ")
+        print(row)
+
         statusValid = ['New', 'Used', 'Cancel']
         if row['ChequeStatus'] in statusValid :
             chequeImportLineInstance = ChequeImportLine()
