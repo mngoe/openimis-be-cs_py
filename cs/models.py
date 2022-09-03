@@ -125,11 +125,8 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
     data_parsed = parse_csv_file(csv_file)
     
     for index, row in data_parsed.iterrows():
-        print(" Row ")
-        print(row)
-
         statusValid = ['New', 'Used', 'Cancel']
-        if row['ChequeStatus'] in statusValid :
+        if row['ChequeStatus'] in statusValid and len(row['NumCheque']) == 6 :
             chequeImportLineInstance = ChequeImportLine()
             if ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).exists():
                 print("Code deja existant - Update ")
@@ -147,14 +144,19 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                 chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
                 chequeImportLineInstance.chequeImportLineStatus = row['ChequeStatus']
                 chequeImportLineInstance.save()
-                print("Code deja existant - Creation ")
                 logger.exception("--------")
                 logger.exception("Cheque Import Line Create :")
                 logger.exception(row['NumCheque'])
                 logger.exception(row['ChequeStatus'])
         else:
-            print(" Import Cheque Statut anormal  ")
-            logger.exception("--------")
-            logger.exception("Import Cheque Statut anormal :")
-            logger.exception(row['NumCheque'])
-            logger.exception(row['ChequeStatus'])
+            if row['ChequeStatus'] in statusValid:
+                logger.exception("--------")
+                logger.exception("Import Cheque Statut anormal :")
+                logger.exception(row['NumCheque'])
+                logger.exception(row['ChequeStatus'])
+            if len(row['NumCheque']) != 6:
+                logger.exception("--------")
+                logger.exception("Import Cheque Code anormal :")
+                logger.exception(row['NumCheque'])
+                logger.exception(row['ChequeStatus'])
+
