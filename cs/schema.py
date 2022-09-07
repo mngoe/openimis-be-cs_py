@@ -9,7 +9,7 @@ class ChequeImportLineGQLType(DjangoObjectType):
         model = ChequeImportLine
         interfaces = (graphene.relay.Node,)
         filter_fields = {
-            "chequeImportLineCode": ["exact","icontains"],
+            "chequeImportLineCode": ["exact", "icontains"],
             "chequeImportLineStatus": ["exact","icontains"],
             "chequeImportLineDate": ["exact", "lt", "lte", "gt", "gte"],
         }
