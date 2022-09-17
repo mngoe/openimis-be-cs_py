@@ -6,10 +6,12 @@ cs/__init__.py
 cs/admin.py
 cs/apps.py
 cs/models.py
+cs/schema.py
+cs/serialize.py
 cs/tests.py
 cs/urls.py
 cs/views.py
-cs/migrations/__init__.py
+cs/migrations/0001_initial.py
 openimis_be_cs.egg-info/PKG-INFO
 openimis_be_cs.egg-info/SOURCES.txt
 openimis_be_cs.egg-info/dependency_links.txt
