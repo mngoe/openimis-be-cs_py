@@ -93,7 +93,9 @@ class UploadChequeResult:
     updated: int = 0
     deleted: int = 0
     errors: int = 0
+    updatedCheques = []
 
+updatedCheques = []
 
 def upload_cheque_to_db(user, file):
     errors = []
@@ -109,6 +111,11 @@ def upload_cheque_to_db(user, file):
             )
         
         result.created += 1
+
+        # Ajout des chèques mis à jour à la liste et Réinitialisation de la liste !!!
+        result.updatedCheques.extend(updatedCheques)
+        result.updatedCheques.clear()
+        updatedCheques.clear()
 
     except Exception as exc:
         logger.exception(exc)
@@ -126,7 +133,9 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
     
     for index, row in data_parsed.iterrows():
         statusValid = ['New', 'Used', 'Cancel']
-        if row['ChequeStatus'] in statusValid and len(row['NumCheque']) == 6 :
+        lengthValid = [6,7,8]
+        # if row['ChequeStatus'] in statusValid and len(row['NumCheque']) == 6 :
+        if row['ChequeStatus'] in statusValid and len(row['NumCheque']) in lengthValid :
             chequeImportLineInstance = ChequeImportLine()
             if ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).exists():
                 print("Code deja existant - Update ")
@@ -135,6 +144,7 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                     chequeImportLineInstanceUpdate = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
                     chequeImportLineInstanceUpdate.chequeImportLineStatus = row['ChequeStatus']
                     chequeImportLineInstanceUpdate.save()
+                    updatedCheques.append((chequeImportLineInstanceUpdate.idChequeImportLine, row['NumCheque'], row['ChequeStatus'], chequeImportLineInstanceUpdate.chequeImportLineDate))
                     logger.exception("--------")
                     logger.exception("Cheque Import Line Update :")
                     logger.exception(row['NumCheque'])
@@ -154,9 +164,33 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                 logger.exception("Import Cheque Statut anormal :")
                 logger.exception(row['NumCheque'])
                 logger.exception(row['ChequeStatus'])
-            if len(row['NumCheque']) != 6:
+            # if len(row['NumCheque']) != 6:
+            if len(row['NumCheque']) not in lengthValid:
                 logger.exception("--------")
                 logger.exception("Import Cheque Code anormal :")
                 logger.exception(row['NumCheque'])
                 logger.exception(row['ChequeStatus'])
 
+    if updatedCheques:
+        logger.exception("Chèques existants mis à jour:")
+        for idChequeImportLine, cheque_code, new_status, chequeImportLineDate in updatedCheques:
+            print(f"Id: {idChequeImportLine}, Code: {cheque_code}, Nouveau statut: {new_status}, Date d'importation: {chequeImportLineDate}")
+            logger.exception(f"Id: {idChequeImportLine}, Code: {cheque_code}, Nouveau statut: {new_status}, Date d'importation: {chequeImportLineDate}")
+
+
+class ChequeUpdatedHistory(models.Model):
+    idChequeUpdated = models.AutoField(
+        db_column="ChequeUpdatedID",
+        primary_key=True
+    )
+    chequeImportLine = models.ForeignKey(ChequeImportLine, models.DO_NOTHING)
+    user = models.ForeignKey(
+        core_models.InteractiveUser, models.DO_NOTHING, db_column="UserID"
+    )
+    updated_date = models.DateTimeField(
+        'Current Updated Date', default=django_tz.now, blank=True
+    )
+    description = models.TextField(max_length=200)
+    
+    class Meta:
+        db_table = "cheque_updated_history"
