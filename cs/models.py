@@ -149,7 +149,7 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                     logger.exception(row['NumCheque'])
                     logger.exception(row['ChequeStatus'])
                 else:
-                    updatedCheques.append((chequeImportGet.idChequeImportLine, row['NumCheque'], "Used", chequeImportGet.chequeImportLineDate))
+                    globalUpdatedCheques.append((chequeImportGet.idChequeImportLine, row['NumCheque'], "Used", chequeImportGet.chequeImportLineDate))
             else:
                 chequeImportLineInstance.chequeImportId = chequeImport
                 chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
