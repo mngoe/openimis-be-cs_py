@@ -95,7 +95,7 @@ class UploadChequeResult:
     errors: int = 0
     updatedCheques = []
 
-updatedCheques = []
+globalUpdatedCheques = []
 
 def upload_cheque_to_db(user, file):
     errors = []
@@ -113,8 +113,8 @@ def upload_cheque_to_db(user, file):
         result.created += 1
 
         # Ajout des chèques mis à jour à la liste et Réinitialisation de la liste !!!
-        result.updatedCheques.extend(updatedCheques)
-        updatedCheques.clear()
+        result.updatedCheques.extend(globalUpdatedCheques)
+        globalUpdatedCheques.clear()
 
     except Exception as exc:
         logger.exception(exc)
@@ -143,7 +143,7 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                     chequeImportLineInstanceUpdate = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
                     chequeImportLineInstanceUpdate.chequeImportLineStatus = row['ChequeStatus']
                     chequeImportLineInstanceUpdate.save()
-                    updatedCheques.append((chequeImportLineInstanceUpdate.idChequeImportLine, row['NumCheque'], row['ChequeStatus'], chequeImportLineInstanceUpdate.chequeImportLineDate))
+                    globalUpdatedCheques.append((chequeImportLineInstanceUpdate.idChequeImportLine, row['NumCheque'], row['ChequeStatus'], chequeImportLineInstanceUpdate.chequeImportLineDate))
                     logger.exception("--------")
                     logger.exception("Cheque Import Line Update :")
                     logger.exception(row['NumCheque'])
@@ -170,9 +170,9 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                 logger.exception(row['NumCheque'])
                 logger.exception(row['ChequeStatus'])
 
-    if updatedCheques:
+    if globalUpdatedCheques:
         logger.exception("Chèques existants mis à jour:")
-        for idChequeImportLine, cheque_code, new_status, chequeImportLineDate in updatedCheques:
+        for idChequeImportLine, cheque_code, new_status, chequeImportLineDate in globalUpdatedCheques:
             print(f"Id: {idChequeImportLine}, Code: {cheque_code}, Nouveau statut: {new_status}, Date d'importation: {chequeImportLineDate}")
             logger.exception(f"Id: {idChequeImportLine}, Code: {cheque_code}, Nouveau statut: {new_status}, Date d'importation: {chequeImportLineDate}")
 
