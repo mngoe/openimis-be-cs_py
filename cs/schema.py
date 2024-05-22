@@ -95,13 +95,12 @@ def update_cheque_status(data, user):
     idChequeImportLine = data.pop('idChequeImportLine') if 'idChequeImportLine' in data else None
     if idChequeImportLine:
         cheque = ChequeImportLine.objects.get(idChequeImportLine=idChequeImportLine)
-        if cheque.chequeImportLineStatus != "Used":
-            old_status = cheque.chequeImportLineStatus 
-            [setattr(cheque, key, data[key]) for key in data]
-            cheque.save()
+        old_status = cheque.chequeImportLineStatus 
+        [setattr(cheque, key, data[key]) for key in data]
+        cheque.save()
 
-            # Creation de l'hitorique
-            create_cheque_updated_history(user, idChequeImportLine, old_status, data['chequeImportLineStatus'])
+        # Creation de l'hitorique
+        create_cheque_updated_history(user, idChequeImportLine, old_status, data['chequeImportLineStatus'])
 
     else:
         raise Exception("Cheque %s does not exist")%(idChequeImportLine)
@@ -156,43 +155,9 @@ class UpdateChequeStatusMutation(OpenIMISMutation):
                 'message': ("cs.mutation.failed_to_update_chequeStatus"),
                 'detail': str(exc)}]
         
-class CreateChequeUpdatedHistoryMutation(OpenIMISMutation):
-    """
-    This mutation will create a Cheque updated hytory
-    """
 
-    _mutation_module = "cs"
-    _mutation_class = "CreateUpdateChequeHistoryMutation"
-
-    class Input(ChequeUpdatedHistoryInputType):
-        pass
-
-    @classmethod
-    def async_mutate(cls, userc, **data):
-        data.pop('client_mutation_label', None)
-        data.pop('client_mutation_id', None)     
-        try:
-            chequeImportLine = ChequeImportLine.objects.get(
-                idChequeImportLine=data['chequeImportLine']
-            ) 
-            # data['user'] = user
-            user_instance = InteractiveUser.objects.get(id=userc.id_for_audit)
-            data['user'] = user_instance
-            data['updated_date'] = TimeUtils.now()
-            oldStatus="Ancien"
-            newStatus = "Nouveau"
-            data['description'] = f"The status has been changed from {oldStatus} to {newStatus}."
-            data['chequeImportLine'] = chequeImportLine
-            chequeUpdatedHistory = ChequeUpdatedHistory.objects.create(**data)
-            chequeUpdatedHistory.save()
-            return None  
-        except Exception as exc:
-            return [{
-                'message': ("cs.mutation.failed_to_create_chequeUpdatedHistory"),
-                'detail': str(exc)}]
 
 
 class Mutation(graphene.ObjectType):
     update_cheque_status = UpdateChequeStatusMutation.Field()
-    chequeUpdatedHistory = CreateChequeUpdatedHistoryMutation.Field()
 
