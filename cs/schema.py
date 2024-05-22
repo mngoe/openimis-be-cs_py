@@ -3,10 +3,9 @@ from core import ExtendedConnection, prefix_filterset
 from core.schema import OpenIMISMutation, OrderedDjangoFilterConnectionField, DjangoObjectType
 from cs.models import ChequeImportLine, ChequeImport
 import graphene
-from django.contrib.auth import authenticate
 from cs.models import ChequeImportLine, ChequeUpdatedHistory
 from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ValidationError, PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import ValidationError
 from core.utils import TimeUtils
 import graphene_django_optimizer as gql_optimizer
 from django.db.models import Q
@@ -76,7 +75,7 @@ class Query(graphene.ObjectType):
 class ChequeUpdatedHistoryInputType(OpenIMISMutation.Input):
     idChequeUpdated = graphene.Int(required=False)
     chequeImportLine = graphene.Int(required=True)
-    user = graphene.Int(required=False)
+    user = graphene.Int(required=True)
     updated_date = graphene.DateTime(required=False)
     description = graphene.String(required=True)
 
@@ -105,8 +104,7 @@ def update_cheque_status(data, user):
             create_cheque_updated_history(user, idChequeImportLine, old_status, data['chequeImportLineStatus'])
 
     else:
-        cheque = ChequeImportLine.objects.create(**data)
-        cheque.save()
+        raise Exception("Cheque %s does not exist")%(idChequeImportLine)
     return cheque
 
 # methode de creation de l'hitorique
