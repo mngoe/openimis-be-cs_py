@@ -30,12 +30,8 @@ def upload_cheque_file(request):
         result = upload_cheque_to_db(
             request.user, file)
         logger.info(f"cheque upload completed: {result}")
-        updatedChequesData = [{
-            "idChequeImportLine": idChequeImportLine,
-            "chequeCode": chequeCode,
-            "newStatus": newStatus,
-            "importDate": chequeImportLineDate
-        } for idChequeImportLine, chequeCode, newStatus, chequeImportLineDate in result.updatedCheques]
+        updatedChequesData = result.updatedCheques.copy()
+        result.updatedCheques.clear()
     except Exception as exc:
         print(exc)
         logger.exception(exc)

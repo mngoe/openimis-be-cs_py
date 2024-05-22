@@ -114,7 +114,6 @@ def upload_cheque_to_db(user, file):
 
         # Ajout des chèques mis à jour à la liste et Réinitialisation de la liste !!!
         result.updatedCheques.extend(updatedCheques)
-        result.updatedCheques.clear()
         updatedCheques.clear()
 
     except Exception as exc:
