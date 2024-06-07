@@ -22,6 +22,7 @@ def upload_cheque_file(request):
     errors = []
     file = serializer.validated_data.get("file")
     filename = serializer.validated_data.get("fileName")
+    updatedChequesData = [] 
     try:
         logger.info(f"Uploading cheque file in CSV format (file={file})...")
         logger.info(f"cheque upload completed: {request.user.id}")
@@ -29,10 +30,12 @@ def upload_cheque_file(request):
         result = upload_cheque_to_db(
             request.user, file)
         logger.info(f"cheque upload completed: {result}")
+        updatedChequesData = result.updatedCheques.copy()
+        result.updatedCheques.clear()
     except Exception as exc:
         print(exc)
         logger.exception(exc)
         errors.append("An unknown error occurred.")
         errors.append(f"File '{file}' is not a valid CSV")
 
-    return JsonResponse({"success": len(errors) == 0, "errors": errors})
+    return JsonResponse({"success": len(errors) == 0, "errors": errors, "updatedCheques": updatedChequesData})
