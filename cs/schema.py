@@ -86,6 +86,8 @@ class ChequeImportLineInputType(OpenIMISMutation.Input):
     chequeImportLineDate = graphene.DateTime(required=False)
     chequeImportLineStatus = graphene.String(required=True)
 
+statusValid = ['New', 'Used', 'Cancel']
+
 # methode de mise a jour du statut de cheque
 def update_cheque_status(data, user):
     if "client_mutation_id" in data:
@@ -96,6 +98,11 @@ def update_cheque_status(data, user):
     if idChequeImportLine:
         cheque = ChequeImportLine.objects.get(idChequeImportLine=idChequeImportLine)
         old_status = cheque.chequeImportLineStatus 
+
+        new_status = data.get('chequeImportLineStatus')
+        if new_status not in statusValid:
+            raise Exception(f"Invalid cheque status: {new_status}. Must be one of {statusValid}")
+
         [setattr(cheque, key, data[key]) for key in data]
         cheque.save()
 
