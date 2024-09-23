@@ -131,46 +131,48 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
     data_parsed = parse_csv_file(csv_file)
     
     for index, row in data_parsed.iterrows():
-        statusValid = ['New', 'Used', 'Cancel']
+        statusValid = ['New', 'Used', 'Cancel'] 
         lengthValid = [6,7,8]
+
+        normalized_status = row['ChequeStatus'].capitalize()
         # if row['ChequeStatus'] in statusValid and len(row['NumCheque']) == 6 :
-        if row['ChequeStatus'] in statusValid and len(row['NumCheque']) in lengthValid :
+        if normalized_status in statusValid and len(row['NumCheque']) in lengthValid :
             chequeImportLineInstance = ChequeImportLine()
             if ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).exists():
                 print("Code deja existant - Update ")
                 chequeImportGet = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
                 if chequeImportGet.chequeImportLineStatus != "Used":
                     chequeImportLineInstanceUpdate = ChequeImportLine.objects.filter(chequeImportLineCode=row['NumCheque']).first()
-                    chequeImportLineInstanceUpdate.chequeImportLineStatus = row['ChequeStatus']
+                    chequeImportLineInstanceUpdate.chequeImportLineStatus = normalized_status
                     chequeImportLineInstanceUpdate.save()
-                    globalUpdatedCheques.append((chequeImportLineInstanceUpdate.idChequeImportLine, row['NumCheque'], row['ChequeStatus'], chequeImportLineInstanceUpdate.chequeImportLineDate))
+                    globalUpdatedCheques.append((chequeImportLineInstanceUpdate.idChequeImportLine, row['NumCheque'], normalized_status, chequeImportLineInstanceUpdate.chequeImportLineDate))
                     logger.exception("--------")
                     logger.exception("Cheque Import Line Update :")
                     logger.exception(row['NumCheque'])
-                    logger.exception(row['ChequeStatus'])
+                    logger.exception(normalized_status)
                 else:
                     globalUpdatedCheques.append((chequeImportGet.idChequeImportLine, row['NumCheque'], "Used", chequeImportGet.chequeImportLineDate))
             else:
                 chequeImportLineInstance.chequeImportId = chequeImport
                 chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
-                chequeImportLineInstance.chequeImportLineStatus = row['ChequeStatus']
+                chequeImportLineInstance.chequeImportLineStatus = normalized_status
                 chequeImportLineInstance.save()
                 logger.exception("--------")
                 logger.exception("Cheque Import Line Create :")
                 logger.exception(row['NumCheque'])
-                logger.exception(row['ChequeStatus'])
+                logger.exception(normalized_status)
         else:
-            if row['ChequeStatus'] in statusValid:
+            if normalized_status in statusValid:
                 logger.exception("--------")
                 logger.exception("Import Cheque Statut anormal :")
                 logger.exception(row['NumCheque'])
-                logger.exception(row['ChequeStatus'])
+                logger.exception(normalized_status)
             # if len(row['NumCheque']) != 6:
             if len(row['NumCheque']) not in lengthValid:
                 logger.exception("--------")
                 logger.exception("Import Cheque Code anormal :")
                 logger.exception(row['NumCheque'])
-                logger.exception(row['ChequeStatus'])
+                logger.exception(normalized_status)
 
     if globalUpdatedCheques:
         logger.exception("Chèques existants mis à jour:")
