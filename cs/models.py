@@ -146,10 +146,8 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                     chequeImportLineInstanceUpdate.chequeImportLineStatus = normalized_status
                     chequeImportLineInstanceUpdate.save()
                     globalUpdatedCheques.append((chequeImportLineInstanceUpdate.idChequeImportLine, row['NumCheque'], normalized_status, chequeImportLineInstanceUpdate.chequeImportLineDate))
-                    logger.exception("--------")
-                    logger.exception("Cheque Import Line Update :")
-                    logger.exception(row['NumCheque'])
-                    logger.exception(normalized_status)
+                    logger.info("Cheque Import Line Update : %s", row['NumCheque'])
+                    logger.info("normalized status %s", normalized_status)
                 else:
                     globalUpdatedCheques.append((chequeImportGet.idChequeImportLine, row['NumCheque'], "Used", chequeImportGet.chequeImportLineDate))
             else:
@@ -157,28 +155,24 @@ def insert_data_to_cheque_line(csv_file, chequeImport):
                 chequeImportLineInstance.chequeImportLineCode = row['NumCheque']
                 chequeImportLineInstance.chequeImportLineStatus = normalized_status
                 chequeImportLineInstance.save()
-                logger.exception("--------")
-                logger.exception("Cheque Import Line Create :")
-                logger.exception(row['NumCheque'])
-                logger.exception(normalized_status)
+                logger.info("Cheque Import Line Create : %s", row['NumCheque'])
+                logger.info("normalized status %s", normalized_status)
         else:
             if normalized_status in statusValid:
-                logger.exception("--------")
-                logger.exception("Import Cheque Statut anormal :")
-                logger.exception(row['NumCheque'])
-                logger.exception(normalized_status)
+                logger.info("Import Cheque Statut anormal : %s", row['NumCheque'])
+                logger.info("normalized status %s", normalized_status)
             # if len(row['NumCheque']) != 6:
             if len(row['NumCheque']) not in lengthValid:
-                logger.exception("--------")
-                logger.exception("Import Cheque Code anormal :")
-                logger.exception(row['NumCheque'])
-                logger.exception(normalized_status)
+                logger.info("Import Cheque Code anormal : %s", row['NumCheque'])
+                logger.info("normalized status %s", normalized_status)
 
     if globalUpdatedCheques:
-        logger.exception("Chèques existants mis à jour:")
+        logger.info("Chèques existants mis à jour:")
         for idChequeImportLine, cheque_code, new_status, chequeImportLineDate in globalUpdatedCheques:
-            print(f"Id: {idChequeImportLine}, Code: {cheque_code}, Nouveau statut: {new_status}, Date d'importation: {chequeImportLineDate}")
-            logger.exception(f"Id: {idChequeImportLine}, Code: {cheque_code}, Nouveau statut: {new_status}, Date d'importation: {chequeImportLineDate}")
+            logger.info(
+                "Id: %s, Code: %s, Nouveau statut: %s, Date d'importation: %s",
+                idChequeImportLine, cheque_code, new_status, chequeImportLineDate
+            )
 
 
 class ChequeUpdatedHistory(models.Model):
