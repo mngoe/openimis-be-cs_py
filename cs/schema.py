@@ -10,6 +10,14 @@ from core.utils import TimeUtils
 import graphene_django_optimizer as gql_optimizer
 from django.db.models import Q
 from core.models import InteractiveUser
+from django.core.exceptions import PermissionDenied
+from django.utils.translation import gettext as _
+from .apps import CsConfig, has_any_right
+
+
+def _check_right(user, perms):
+    if not has_any_right(user, perms):
+        raise PermissionDenied(_("unauthorized"))
 
 class ChequeImportLineGQLType(DjangoObjectType):
     class Meta:
@@ -64,7 +72,17 @@ class Query(graphene.ObjectType):
     )
 
     ChequeUpdatedHistories = OrderedDjangoFilterConnectionField(ChequeUpdatedHistoryGQLType)
+
+    def resolve_chequeimportline(self, info, **kwargs):
+        _check_right(info.context.user, CsConfig.gql_query_cheques_perms)
+        return ChequeImportLine.objects.all()
+
+    def resolve_chequeimport(self, info, **kwargs):
+        _check_right(info.context.user, CsConfig.gql_query_cheques_perms)
+        return ChequeImport.objects.all()
+
     def resolve_ChequeUpdatedHistories(self, info, **kwargs):
+        _check_right(info.context.user, CsConfig.gql_query_cheques_perms)
         filters = []
         ids = kwargs.get('id', None)
         if ids:
@@ -153,6 +171,7 @@ class UpdateChequeStatusMutation(OpenIMISMutation):
             if type(user) is AnonymousUser or not user.id:
                 raise ValidationError(
                     ("mutation.authentication_required"))
+            _check_right(user, CsConfig.gql_mutation_update_cheques_perms)
             data['audit_user_id'] = user.id_for_audit
             update_cheque_status(data, user)
             
