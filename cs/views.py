@@ -4,7 +4,9 @@ from django.shortcuts import render
 from cs.models import ChequeImport, upload_cheque_to_db
 from django.core import serializers
 from cs import serialize
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from cs.apps import CsConfig, has_any_right
 from django.views.decorators.http import require_http_methods
 from django.core.exceptions import PermissionDenied
 from django.utils.translation import gettext as _
@@ -16,7 +18,10 @@ import pandas as pd
 logger = logging.getLogger(__name__)
 
 @api_view(["POST"])
+@permission_classes([IsAuthenticated])
 def upload_cheque_file(request):
+    if not has_any_right(request.user, CsConfig.cheque_upload_perms):
+        raise PermissionDenied(_("unauthorized"))
     serializer = serialize.UploadSerializer(data=request.data)
     serializer.is_valid(raise_exception=True)
     errors = []
